@@ -8,25 +8,30 @@ const handleDragStart = (e) => e.preventDefault();
 
 const HomeCarousel = () => {
   const navigate = useNavigate();
+
   const item = homeCarouselData.map((item) => (
     <img
-      className="cursor-pointer rounded-md"
+      className="cursor-pointer rounded-md w-full h-[539px] object-cover"
       onClick={() => navigate(item.path)}
       src={item.image}
       alt=""
       onDragStart={handleDragStart}
       role="presentation"
+      key={item.image}
     />
   ));
+
   return (
-    <AliceCarousel
-      mouseTracking
-      items={item}
-      autoPlay
-      infinite
-      autoPlayInterval={2000}
-      disableButtonsControls
-    />
+    <div className="max-w-screen-xl mx-auto">
+      <AliceCarousel
+        mouseTracking
+        items={item}
+        autoPlay
+        infinite
+        autoPlayInterval={2000}
+        disableButtonsControls
+      />
+    </div>
   );
 };
 
