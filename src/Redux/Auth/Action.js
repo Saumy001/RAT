@@ -21,19 +21,22 @@ const registerRequest = () => ({ type: REGISTER_REQUEST });
 const registerSuccess = (user) => ({ type: REGISTER_SUCCESS, payload:user });
 const registerFailure = error => ({ type: REGISTER_FAILURE, payload: error });
 
-export const register = userData => async dispatch => {
+export const register = (userData) => async (dispatch) => {
   dispatch(registerRequest());
   try {
-    const response=await axios.post(`${API_BASE_URL}/auth/signup`, userData);
+    const response = await axios.post(`${API_BASE_URL}/auth/signup`, userData);
     const user = response.data;
-    if(user.jwt) localStorage.setItem("jwt",user.jwt)
-    console.log("registerr :- ",user)
+    if (user.jwt) localStorage.setItem("jwt", user.jwt);
+    console.log("register :- ", user);
     dispatch(registerSuccess(user));
+    return { success: true, user }; // ✅ Return success result
   } catch (error) {
-    console.log("error ",error)
+    console.log("error ", error);
     dispatch(registerFailure(error.message));
+    return { success: false, error: error.message }; // ✅ Return error
   }
 };
+
 
 // Login action creators
 const loginRequest = () => ({ type: LOGIN_REQUEST });

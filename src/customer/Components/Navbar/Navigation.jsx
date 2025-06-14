@@ -13,7 +13,7 @@ import { navigation } from "../../../config/navigationMenu";
 import AuthModal from "../Auth/AuthModal";
 import { useDispatch, useSelector } from "react-redux";
 import { deepPurple } from "@mui/material/colors";
-import { getUser, logout } from "../../../Redux/features/authSlice";
+import { getUser, logout } from "../../../Redux/Auth/Action";
 import { getCart } from "../../../Redux/Customers/Cart/Action";
 import TextField from "@mui/material/TextField";
 import { useCallback } from "react";
