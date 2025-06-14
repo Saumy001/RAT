@@ -13,9 +13,10 @@ import { navigation } from "../../../config/navigationMenu";
 import AuthModal from "../Auth/AuthModal";
 import { useDispatch, useSelector } from "react-redux";
 import { deepPurple } from "@mui/material/colors";
-import { getUser, logout } from "../../../Redux/Auth/Action";
+import { getUser, logout } from "../../../Redux/features/authSlice";
 import { getCart } from "../../../Redux/Customers/Cart/Action";
 import TextField from "@mui/material/TextField";
+import { useCallback } from "react";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -34,7 +35,7 @@ export default function Navigation() {
 
   useEffect(() => {
     if (jwt) {
-      dispatch(getUser(jwt));
+    
       dispatch(getCart(jwt));
     }
   }, [jwt]);
@@ -47,11 +48,13 @@ export default function Navigation() {
   };
 
   const handleOpen = () => {
+    navigate("/login"); 
     setOpenAuthModal(true);
   };
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setOpenAuthModal(false);
-  };
+    navigate("/");
+  }, [navigate]);
 
   const handleCategoryClick = (category, section, item, close) => {
     navigate(`/${category.id}/${section.id}/${item.id}`);
@@ -423,7 +426,7 @@ export default function Navigation() {
                           cursor: "pointer",
                         }}
                       >
-                        {auth.user?.firstName[0].toUpperCase()}
+                       {auth.user?.firstName?.charAt(0).toUpperCase() || ""}
                       </Avatar>
                       {/* <Button
                         id="basic-button"

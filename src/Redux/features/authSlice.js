@@ -2,28 +2,37 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'http://localhost:5454';
 
 // Thunk: Login
 export const login = createAsyncThunk(
   'auth/login',
   async (credentials, thunkAPI) => {
     try {
-      const res = await axios.get(
-        `${API_BASE_URL}/users?email=${credentials.email}&password=${credentials.password}`
-      );
+      // Step 1: Login to get token
+      const res = await axios.post(`${API_BASE_URL}/auth/signin`, credentials);
+      const token = res.data.jwt;
 
-      if (res.data.length > 0) {
-        const user = res.data[0];
-        const token = 'mock-jwt-token'; // Fake token
-
-        localStorage.setItem('jwt', token);
-        return { user, token };
-      } else {
-        return thunkAPI.rejectWithValue('Invalid email or password');
+      if (!token) {
+        return thunkAPI.rejectWithValue('No token returned from login');
       }
+
+      localStorage.setItem('jwt', token);
+
+      // Step 2: Use token to fetch user info
+      const userRes = await axios.get(`${API_BASE_URL}/api/users/profile`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const user = userRes.data;
+
+      return { user, token };
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || error.message
+      );
     }
   }
 );
@@ -33,19 +42,18 @@ export const register = createAsyncThunk(
   'auth/register',
   async (userData, thunkAPI) => {
     try {
-      const res = await axios.post(`${API_BASE_URL}/users`, userData);
+      const res = await axios.post(`${API_BASE_URL}/auth/signup`, userData);
       const user = res.data;
-      const token = 'mock-jwt-token'; // Fake token
 
-      localStorage.setItem('jwt', token);
-      return { user, token };
+      // You can trigger OTP here if needed separately
+      return { user };
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
   }
 );
 
-// Thunk: Get User from token (mocked)
+// Thunk: Get user from stored token (for page reload)
 export const getUser = createAsyncThunk(
   'auth/getUser',
   async (_, thunkAPI) => {
@@ -53,12 +61,18 @@ export const getUser = createAsyncThunk(
       const token = localStorage.getItem('jwt');
       if (!token) throw new Error('No token found');
 
-      // Fake user load logic (load first user for demo)
-      const res = await axios.get(`${API_BASE_URL}/users`);
-      const user = res.data[0]; // Simulate login with stored token
+      const res = await axios.get(`${API_BASE_URL}/api/users/profile`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const user = res.data;
       return user;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || error.message
+      );
     }
   }
 );
@@ -86,8 +100,42 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // LOGIN
+      .addCase(login.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(login.fulfilled, (state, action) => {
+        console.log("LOGIN SUCCESS", action.payload);  
+        state.status = 'succeeded';
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+      })
+      .addCase(login.rejected, (state, action) => {
+        console.log("LOGIN FAILED", action.payload);
+        state.status = 'failed';
+        state.error = action.payload;
+      })
+
+      // REGISTER
+      .addCase(register.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(register.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.user = action.payload.user;
+        // Token is not provided during register until OTP verified
+      })
+      .addCase(register.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
+      })
+
+      // GET USER
       .addCase(getUser.pending, (state) => {
         state.status = 'loading';
+        state.error = null;
       })
       .addCase(getUser.fulfilled, (state, action) => {
         state.status = 'succeeded';
@@ -96,32 +144,13 @@ const authSlice = createSlice({
       .addCase(getUser.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;
-      })
 
-      .addCase(register.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(register.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-      })
-      .addCase(register.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload;
-      })
-
-      .addCase(login.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(login.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-      })
-      .addCase(login.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload;
+        // Optionally auto-logout on unauthorized
+        if (action.payload === 'Unauthorized') {
+          state.user = null;
+          state.token = null;
+          localStorage.removeItem('jwt');
+        }
       });
   },
 });

@@ -8,42 +8,47 @@ import { useEffect, useState } from "react";
 export default function LoginUserForm({ handleNext }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const jwt = localStorage.getItem("jwt");
   const [openSnackBar, setOpenSnackBar] = useState(false);
-  const { auth } = useSelector((store) => store);
-  const handleCloseSnakbar = () => setOpenSnackBar(false);
 
+  const auth = useSelector((store) => store.auth); // ✅ use store.auth, not store.auth.auth
+
+  // Auto-fetch user from token if available
   useEffect(() => {
-    if (jwt) {
-      dispatch(getUser(jwt));
+    const token = localStorage.getItem("jwt");
+    if (token && !auth.user) {
+      dispatch(getUser());
     }
-  }, [jwt]);
+  }, [dispatch, auth.user]);
 
-  useEffect(() => {
-    if (auth.user || auth.error) {
-      setOpenSnackBar(true);
-    }
-  }, [auth.user, auth.error]);
-
-  // Optional: Redirect on successful login
+  // Redirect after login
   useEffect(() => {
     if (auth.user) {
-      navigate("/dashboard"); // Replace with your target route
+      navigate("/", { replace: true });
     }
-  }, [auth.user]);
+  }, [auth.user, navigate]);
+
+  // Snackbar on error/success
+  useEffect(() => {
+    if (auth.error || auth.user) {
+      setOpenSnackBar(true);
+    }
+  }, [auth.error, auth.user]);
+
+  const handleCloseSnakbar = () => setOpenSnackBar(false);
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    console.log("Form submitted");
     const data = new FormData(event.currentTarget);
     const userData = {
       email: data.get("email"),
       password: data.get("password"),
     };
-    dispatch(login(userData));
+    dispatch(login(userData)); // 🔥 This dispatches login thunk in authSlice
   };
 
   return (
-    <React.Fragment className="shadow-lg">
+    <div className="shadow-lg">
       <form className="w-full" onSubmit={handleSubmit}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
@@ -73,9 +78,10 @@ export default function LoginUserForm({ handleNext }) {
               type="submit"
               variant="contained"
               size="large"
+              disabled={auth.status === "loading"}
               sx={{ padding: ".8rem 0" }}
             >
-              Login
+              {auth.status === "loading" ? "Logging in..." : "Login"}
             </Button>
           </Grid>
         </Grid>
@@ -92,11 +98,11 @@ export default function LoginUserForm({ handleNext }) {
         <Alert
           onClose={handleCloseSnakbar}
           severity={auth.error ? "error" : "success"}
-          sx={{ width: '100%' }}
+          sx={{ width: "100%" }}
         >
           {auth.error ? auth.error : "Login Success"}
         </Alert>
       </Snackbar>
-    </React.Fragment>
+    </div>
   );
 }

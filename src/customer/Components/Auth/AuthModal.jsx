@@ -7,6 +7,8 @@ import LoginUserForm from "./Login";
 import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Alert, Snackbar } from "@mui/material";
+import VerifyOtp from "./VerifyOtp";
+
 
 const style = {
   position: "absolute",
@@ -23,8 +25,11 @@ export default function AuthModal({ handleClose, open }) {
   const location = useLocation();
   const { auth } = useSelector((store) => store);
   useEffect(() => {
-    if (auth.user) handleClose();
-  }, [auth.user]);
+    if (auth.user && location.pathname === "/login") {
+      handleClose();
+    }
+  }, [auth.user, location.pathname, handleClose]);
+  
   return (
     <>
     <Modal
@@ -35,11 +40,14 @@ export default function AuthModal({ handleClose, open }) {
       size="large"
     >
       <Box className="rounded-md" sx={style}>
-        {location.pathname === "/login" ? (
-          <LoginUserForm />
-        ) : (
-          <RegisterUserForm />
-        )}
+      {location.pathname === "/login" ? (
+  <LoginUserForm />
+) : location.pathname === "/register" ? (
+  <RegisterUserForm />
+) : location.pathname === "/verify-otp" ? (
+  <VerifyOtp />
+) : null}
+
       </Box>
     </Modal>
     

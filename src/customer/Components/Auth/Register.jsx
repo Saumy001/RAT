@@ -38,7 +38,7 @@ export default function RegisterUserForm({ handleNext }) {
 
   // Optional: redirect after successful registration
   useEffect(() => {
-    if (auth.user) {
+    if (auth.user && auth.user.otpVerified) {
       navigate("/dashboard"); // Change as per your app's flow
     }
   }, [auth.user]);
@@ -51,10 +51,15 @@ export default function RegisterUserForm({ handleNext }) {
       lastName: data.get("lastName"),
       email: data.get("email"),
       password: data.get("password"),
-      role: role, // using controlled input
+      role: "ROLE_CUSTOMER"  // hardcoded role
     };
-    dispatch(register(userData));
+    dispatch(register(userData)).then((res) => {
+      if (!res.error) {
+        navigate("/verify-otp", { state: { email: userData.email } });
+      }
+    });
   };
+  
 
   return (
     <div>
@@ -90,7 +95,7 @@ export default function RegisterUserForm({ handleNext }) {
               autoComplete="email"
             />
           </Grid>
-          <Grid item xs={12}>
+          {/* <Grid item xs={12}>
             <FormControl fullWidth required>
               <InputLabel id="role-label">Role</InputLabel>
               <Select
@@ -105,7 +110,7 @@ export default function RegisterUserForm({ handleNext }) {
                 <MenuItem value={"ROLE_CUSTOMER"}>Customer</MenuItem>
               </Select>
             </FormControl>
-          </Grid>
+          </Grid> */}
           <Grid item xs={12}>
             <TextField
               required

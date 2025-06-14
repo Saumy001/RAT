@@ -1,10 +1,10 @@
 export const homeCarouselData=[
     {
-        image:"images/assets/IMG_8079.JPG",
+        image:"images/assets/image.webp",
         path:"/women/clothing/lengha_choli"
     },
     {
-        image:"images/assets/IMG_8079.JPG",
+        image:"images/assets/chaff-cutter.webp",
         path:"/women/clothing/women_dress"
     },
     {

@@ -1,13 +1,20 @@
-{
-    "users": [
-      {
-        "id": 1,
-        "email": "admin@example.com",
-        "password": "admin123",
-        "firstName": "Admin",
-        "lastName": "User",
-        "role": "ROLE_ADMIN"
-      }
-    ]
-  }
-  
+// {
+//   "users": [
+//     {
+//       "id": 1,
+//       "email": "admin@example.com",
+//       "password": "admin123",
+//       "firstName": "Admin",
+//       "lastName": "User",
+//       "role": "ROLE_ADMIN"
+//     },
+//     {
+//       "id": 2,
+//       "email": "saumys10@gmail.com",
+//       "password": "123456789",
+//       "firstName": "Saumy",
+//       "lastName": "Sharma",
+//       "role": "ROLE_CUSTOMER"
+//     }
+//   ]
+// }

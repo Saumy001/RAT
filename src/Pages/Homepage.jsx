@@ -2,55 +2,44 @@ import React from "react";
 import HomeCarousel from "../customer/Components/Carousel/HomeCarousel";
 import { homeCarouselData } from "../customer/Components/Carousel/HomeCaroselData";
 import HomeProductSection from "../customer/Components/Home/HomeProductSection";
-import { sareePage1 } from "../Data/Saree/page1";
-import { dressPage1 } from "../Data/dress/page1";
-import { gounsPage1 } from "../Data/Gouns/gouns";
-import { kurtaPage1 } from "../Data/Kurta/kurta";
-import { mensShoesPage1 } from "../Data/shoes";
-import { mens_kurta } from "../Data/Men/men_kurta";
-import { lengha_page1 } from "../Data/Women/LenghaCholi";
+import { machineryData } from "../Data/machinery";
+import AuthModal from "../customer/Components/Auth/AuthModal";
+import { useLocation, useNavigate } from "react-router-dom";
+
+// Group products by category
+const groupedProducts = machineryData.reduce((acc, product) => {
+  if (!acc[product.category]) acc[product.category] = [];
+  acc[product.category].push(product);
+  return acc;
+}, {});
 
 const Homepage = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  // const productSections = [
-  //   { section: "Men's Kurta", data: mens_kurta },
-  //   { section: "Men's Shoes", data: mensShoesPage1 },
-  //   { section: "Lengha Choli", data: lengha_page1 },
-  //   { section: "Saree", data: sareePage1 },
-  //   { section: "Dress", data: dressPage1 },
-  //   { section: "Women's Gouns", data: gounsPage1 },
-  //   { section: "Women's Kurtas", data: kurtaPage1 },
-  // ];
-  
+  // Determine if modal should be open
+  const isAuthPath = ["/login", "/register", "/verify-otp"].includes(location.pathname);
 
   return (
     <div className="">
+      {/* Auth Modal */}
+      {isAuthPath && (
+        <AuthModal open={true} handleClose={() => navigate("/")} />
+      )}
+
+      {/* Main Homepage Content */}
       <HomeCarousel images={homeCarouselData} />
-
       <div className="space-y-10 py-20">
-      <HomeProductSection data={mens_kurta} section={"Men's Kurta"} />
-        <HomeProductSection data={mensShoesPage1} section={"Men's Shoes"} />
-        <HomeProductSection data={lengha_page1} section={"Lengha Choli"} />
-        <HomeProductSection data={sareePage1} section={"Saree"} />
-        <HomeProductSection data={dressPage1} section={"Dress"} />
-        <HomeProductSection data={gounsPage1} section={"Women's Gouns"} />
-        <HomeProductSection data={kurtaPage1} section={"Women's Kurtas"} />
-        {/* <HomeProductSection data={mensPantsPage1} section={"Men's Pants"} /> */}
-
-        
-        {/* {productSections.map((item) => (
-  <HomeProductSection key={item.section} section={item.section} data={item.data} />
-))} */}
-
-
-
+        {Object.keys(groupedProducts).map((category) => (
+          <HomeProductSection
+            key={category}
+            data={groupedProducts[category]}
+            section={category}
+          />
+        ))}
       </div>
-
-      
     </div>
   );
 };
 
 export default Homepage;
-
-
