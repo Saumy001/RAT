@@ -20,6 +20,8 @@ import PaymentSuccess from "../customer/Components/paymentSuccess/PaymentSuccess
 import RateProduct from "../customer/Components/ReviewProduct/RateProduct";
 import SearchProduct from "../customer/Components/Product/Product/SearchProduct";
 import VerifyOtp from "../customer/Components/Auth/VerifyOtp";
+import ForgotPassword from "../customer/Components/Auth/ForgotPassword";
+import ResetPassword from "../customer/Components/Auth/ResetPassword";
 
 const CustomerRoutes = () => {
     const location = useLocation();
@@ -38,6 +40,9 @@ const CustomerRoutes = () => {
      <Route path="/login" element={<Homepage />}></Route>
      <Route path="/register" element={<Homepage />}></Route>
      <Route path="/verify-otp" element={<Homepage />} > </Route>
+     <Route path="/forgot-password" element={<ForgotPassword />} />
+<Route path="/reset-password" element={<ResetPassword />} />
+
 
 
         <Route path="/" element={<Homepage />}></Route>

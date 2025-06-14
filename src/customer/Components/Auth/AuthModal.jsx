@@ -8,6 +8,8 @@ import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Alert, Snackbar } from "@mui/material";
 import VerifyOtp from "./VerifyOtp";
+import ForgotPassword from "./ForgotPassword"; // Import the ForgotPassword component
+import ResetPassword from "./ResetPassword"; // Import the ResetPassword component
 
 
 const style = {
@@ -32,13 +34,22 @@ export default function AuthModal({ handleClose, open }) {
   
   return (
     <>
-    <Modal
-      open={open}
-      onClose={handleClose}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-      size="large"
-    >
+<Modal
+  open={open}
+  onClose={handleClose}
+  aria-labelledby="modal-modal-title"
+  aria-describedby="modal-modal-description"
+  slotProps={{
+    backdrop: {
+      sx: {
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+        backdropFilter: "blur(3px)",
+      },
+    },
+  }}
+>
+
+
       <Box className="rounded-md" sx={style}>
       {location.pathname === "/login" ? (
   <LoginUserForm />
@@ -46,7 +57,12 @@ export default function AuthModal({ handleClose, open }) {
   <RegisterUserForm />
 ) : location.pathname === "/verify-otp" ? (
   <VerifyOtp />
-) : null}
+) : location.pathname === "/forgot-password" ? (
+  <ForgotPassword />  // import this component
+) :location.pathname === "/reset-password" ? (
+  <ResetPassword /> 
+ ) : null}
+
 
       </Box>
     </Modal>

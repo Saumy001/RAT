@@ -61,6 +61,7 @@ export default function LoginUserForm({ handleNext }) {
               autoComplete="email"
             />
           </Grid>
+
           <Grid item xs={12}>
             <TextField
               required
@@ -72,6 +73,18 @@ export default function LoginUserForm({ handleNext }) {
               autoComplete="current-password"
             />
           </Grid>
+
+          {/* Forgot Password Button */}
+          <Grid item xs={12} className="text-right -mt-2">
+            <Button
+              onClick={() => navigate("/forgot-password")}
+              size="small"
+              sx={{ textTransform: "none", padding: 0, minWidth: "auto" }}
+            >
+              Forgot Password?
+            </Button>
+          </Grid>
+
           <Grid item xs={12}>
             <Button
               className="bg-[#9155FD] w-full"
@@ -86,6 +99,7 @@ export default function LoginUserForm({ handleNext }) {
           </Grid>
         </Grid>
       </form>
+
       <div className="flex justify-center flex-col items-center">
         <div className="py-3 flex items-center">
           <p className="m-0 p-0">Don't have an account?</p>
@@ -94,6 +108,7 @@ export default function LoginUserForm({ handleNext }) {
           </Button>
         </div>
       </div>
+
       <Snackbar open={openSnackBar} autoHideDuration={6000} onClose={handleCloseSnakbar}>
         <Alert
           onClose={handleCloseSnakbar}
